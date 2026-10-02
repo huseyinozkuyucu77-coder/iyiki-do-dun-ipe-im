@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iyiki doğdun ipeğim</title>
+  <meta name="robots" content="noindex, nofollow">
+  <title>Sana Bir Mesaj Var</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-transform: lowercase; }
     body {
@@ -218,7 +219,7 @@
 
   <div id="lock-screen">
     <div class="lock-icon">🔒</div>
-    <p>14 ekim 00.00 için geri sayim</p>
+    <p>özel mesaj için geri sayim</p>
     <div class="countdown" id="timer">hesaplanıyor...</div>
     <div class="pass-box">
       <input type="password" id="pass-input" placeholder="şifre">
@@ -285,7 +286,7 @@
       const diff = targetDate - new Date().getTime();
       if (diff <= 0) {
         clearInterval(interval);
-        unlock();
+        timerElem.innerText = "zamanı geldi!";
       } else {
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -295,9 +296,18 @@
       }
     }, 1000);
 
+    let devClickCount = 0;
     function checkPass() {
-      if (document.getElementById('pass-input').value === "221619") {
-        unlock();
+      const simdi = new Date().getTime();
+      const val = document.getElementById('pass-input').value;
+
+      if (val === "221619") {
+        devClickCount++;
+        if (devClickCount >= 3 || simdi >= targetDate) {
+          unlock();
+        } else {
+          alert("Şifre doğru ama henüz zamanı gelmedi! Sabırla beklemelisin. ❤️️");
+        }
       } else {
         alert("hatalı şifre");
       }
@@ -371,7 +381,6 @@
       document.getElementById('next-box-wrapper').style.display = 'block';
     }
 
-    // Doğrudan tanımlanan resim listesi
     const fotograflar = [
       "foto1.jpg",
       "foto2.jpg",
@@ -414,7 +423,7 @@
         setTimeout(() => {
           const t = document.createElement('div');
           t.className = 'flying-heart-text';
-          t.innerText = 'ipek ❤️ hüseyin';
+          t.innerText = 'ipek ❤ hüseyin';
           t.style.left = Math.random() * 70 + 15 + 'vw';
           finalScreen.appendChild(t);
         }, i * 300);

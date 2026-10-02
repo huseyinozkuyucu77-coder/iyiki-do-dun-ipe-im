@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iyiki doğdun ipeğim</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-transform: lowercase; }
+    body {
+      background: #11081f;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #lock-screen {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      width: 90%;
+      max-width: 380px;
+      z-index: 10;
+    }
+    .lock-icon { font-size: 60px; margin-bottom: 15px; }
+    .countdown { font-size: 18px; color: #ff85c0; margin: 15px 0; font-weight: bold; }
+    .pass-box { display: flex; gap: 10px; margin-top: 15px; }
+    .pass-box input {
+      flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ff85c0;
+      background: rgba(0,0,0,0.4); color: #fff; text-align: center; outline: none;
+    }
+    .pass-box button {
+      padding: 10px 15px; background: #ff85c0; border: none; color: #fff;
+      border-radius: 8px; cursor: pointer; font-weight: bold;
+    }
+
+    #main-content {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .flower {
+      position: fixed;
+      bottom: -50px;
+      font-size: 26px;
+      animation: growUp 6s linear infinite;
+      z-index: 1;
+      pointer-events: none;
+    }
+    @keyframes growUp {
+      0% { transform: translateY(0) scale(0.3) rotate(0deg); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translateY(-110vh) scale(1.2) rotate(360deg); opacity: 0; }
+    }
+
+    .cake-wrapper {
+      position: relative;
+      margin: 40px 0 20px 0;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    .cake-3d {
+      width: 240px;
+      height: 120px;
+      background: linear-gradient(180deg, #ffb3d9, #ff66b2);
+      border-radius: 50% / 30%;
+      position: relative;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .cake-top-text {
+      font-size: 20px;
+      font-weight: bold;
+      color: #7a003c;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.6);
+      z-index: 3;
+    }
+    .candles-ring {
+      position: absolute;
+      width: 220px;
+      height: 100px;
+      top: -15px;
+      border-radius: 50%;
+    }
+    .candle {
+      position: absolute;
+      width: 6px;
+      height: 25px;
+      background: repeating-linear-gradient(0deg, #fff, #fff 4px, #ff4d4d 4px, #ff4d4d 8px);
+      border-radius: 3px;
+    }
+    .flame {
+      position: absolute;
+      top: -10px; left: 50%;
+      transform: translateX(-50%);
+      width: 8px; height: 12px;
+      background: #ffaa00;
+      border-radius: 50% 50% 20% 20%;
+      box-shadow: 0 0 8px #ffaa00;
+      animation: flick 0.6s infinite alternate;
+    }
+    .flame.off { display: none; }
+    @keyframes flick { 0% { transform: translateX(-50%) scale(1); } 100% { transform: translateX(-50%) scale(1.2); } }
+
+    .next-box-wrapper {
+      display: none;
+      position: fixed;
+      right: 20px;
+      bottom: 40px;
+      text-align: center;
+      z-index: 20;
+    }
+    .next-box {
+      width: 50px;
+      height: 50px;
+      background: #ff85c0;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255,133,192,0.4);
+      margin: 0 auto 5px auto;
+      transition: 0.3s;
+    }
+    .next-box:hover { transform: scale(1.1); }
+    .next-text { font-size: 12px; color: #ffb3d9; }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff; color: #333;
+      padding: 25px; border-radius: 15px;
+      width: 90%; max-width: 450px;
+      z-index: 30; text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .modal h3 { color: #ff4d88; margin-bottom: 15px; font-size: 20px; }
+    .modal p { margin-bottom: 15px; line-height: 1.5; font-size: 14px; }
+    .modal-btn {
+      padding: 10px 20px; background: #ff4d88; color: #fff;
+      border: none; border-radius: 8px; cursor: pointer; font-weight: bold;
+    }
+
+    .slide-img-container {
+      width: 100%; height: 300px;
+      background: #2a1b40; border-radius: 12px;
+      margin-bottom: 15px;
+      display: flex; justify-content: center; align-items: center;
+      overflow: hidden;
+      border: 2px dashed #ff85c0;
+      position: relative;
+    }
+    .slide-img {
+      max-width: 100%; max-height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .slide-controls { display: flex; justify-content: space-between; align-items: center; }
+
+    #final-screen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #000; z-index: 50;
+      justify-content: center; align-items: center;
+      flex-direction: column; text-align: center; padding: 20px;
+    }
+    .final-msg {
+      font-size: 22px; color: #ff85c0; margin-bottom: 30px;
+      text-shadow: 0 0 10px #ff85c0; animation: fadeIn 2s ease;
+      max-width: 600px; line-height: 1.5;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .flying-heart-text {
+      position: absolute;
+      font-size: 18px; color: #ff4d88;
+      text-shadow: 0 0 8px #ff4d88;
+      pointer-events: none;
+      animation: floatUpText 4s linear infinite;
+    }
+    @keyframes floatUpText {
+      0% { transform: translateY(50vh) scale(0.5); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(-50vh) scale(1.2); opacity: 0; }
+    }
+
+    canvas { position: absolute; top: 0; left: 0; }
+    .center-title {
+      position: relative; z-index: 60;
+      font-size: 36px; font-weight: bold; color: #ff85c0;
+      text-shadow: 0 0 20px #ff85c0, 0 0 40px #ff4d88;
+      animation: pulse 1.5s infinite; margin-top: 20px;
+    }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+  </style>
+</head>
+<body>
+
+  <div id="lock-screen">
+    <div class="lock-icon">🔒</div>
+    <p>14 ekim 00.00 için geri sayim</p>
+    <div class="countdown" id="timer">hesaplanıyor...</div>
+    <div class="pass-box">
+      <input type="password" id="pass-input" placeholder="şifre">
+      <button onclick="checkPass()">gir</button>
+    </div>
+  </div>
+
+  <div id="main-content">
+    <h2 style="color: #ff85c0; margin-bottom: 10px;">iyiki doğdun iyiki varsın sevgilim</h2>
+    <div id="blow-status" style="color: #50fa7b; font-weight: bold; margin-bottom: 10px;">3... 2... 1... üfle</div>
+
+    <div class="cake-wrapper" onclick="startBlow()">
+      <div class="cake-3d">
+        <span class="cake-top-text">iyiki doğdun ipeğim</span>
+        <div class="candles-ring" id="candles-ring"></div>
+      </div>
+    </div>
+
+    <div id="envelope-box" style="display:none; margin-top: 30px; cursor: pointer;" onclick="openLetter()">
+      <p style="margin-bottom: 5px; color: #ffb3d9;">sana bir notum var</p>
+      <div style="font-size: 50px;">✉️</div>
+    </div>
+  </div>
+
+  <div class="next-box-wrapper" id="next-box-wrapper">
+    <div class="next-box" onclick="openGallery()">➔</div>
+    <div class="next-text">oka dokunarak devam et</div>
+  </div>
+
+  <div class="modal" id="letter-modal">
+    <h3>sevgili ipeğim</h3>
+    <p id="letter-text">
+      buraya kendi doğum günü mesajını yazabilirsin
+    </p>
+    <button class="modal-btn" onclick="closeLetter()">kapat</button>
+  </div>
+
+  <div class="modal" id="gallery-modal">
+    <h3>bizim anılarımız</h3>
+    <div class="slide-img-container">
+      <img id="gallery-img" class="slide-img" alt="fotoğraf yüklenemedi">
+    </div>
+    <div class="slide-controls">
+      <button class="modal-btn" onclick="prevImg()">◀ geri</button>
+      <button class="modal-btn" onclick="nextImg()">ileri ▶</button>
+    </div>
+    <br>
+    <button class="modal-btn" style="background: #50fa7b; color: #000; margin-top: 10px;" onclick="finishGallery()">devam et ➔</button>
+  </div>
+
+  <div id="final-screen">
+    <div class="final-msg" id="final-msg">
+      hayatımı güzelleştirdin fotoğraflarda kanıtı iyiki varsın iyiki benimsin sevgilim
+    </div>
+    <div class="center-title" id="final-title" style="display:none;">ipek ❤️ hüseyin</div>
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script>
+    const targetDate = new Date(`October 14, ${new Date().getFullYear()} 00:00:00`).getTime();
+
+    const timerElem = document.getElementById('timer');
+    const interval = setInterval(() => {
+      const diff = targetDate - new Date().getTime();
+      if (diff <= 0) {
+        clearInterval(interval);
+        unlock();
+      } else {
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        timerElem.innerText = `${d} gün ${h} saat ${m} dk ${s} sn kaldı`;
+      }
+    }, 1000);
+
+    function checkPass() {
+      if (document.getElementById('pass-input').value === "221619") {
+        unlock();
+      } else {
+        alert("hatalı şifre");
+      }
+    }
+
+    function unlock() {
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('main-content').style.display = 'flex';
+      initFlowers();
+      createCandles();
+    }
+
+    function initFlowers() {
+      const items = ['🌼', '🌹', '🌷', '🌸', '💖'];
+      setInterval(() => {
+        const el = document.createElement('div');
+        el.className = 'flower';
+        el.innerText = items[Math.floor(Math.random() * items.length)];
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.animationDuration = (Math.random() * 3 + 4) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 7000);
+      }, 500);
+    }
+
+    function createCandles() {
+      const ring = document.getElementById('candles-ring');
+      for (let i = 0; i < 14; i++) {
+        const angle = (i / 14) * Math.PI * 2;
+        const x = 100 + 95 * Math.cos(angle);
+        const y = 40 + 35 * Math.sin(angle);
+        const c = document.createElement('div');
+        c.className = 'candle';
+        c.style.left = x + 'px';
+        c.style.top = y + 'px';
+        const f = document.createElement('div');
+        f.className = 'flame';
+        c.appendChild(f);
+        ring.appendChild(c);
+      }
+    }
+
+    let blown = false;
+    function startBlow() {
+      if (blown) return;
+      blown = true;
+      const status = document.getElementById('blow-status');
+      let count = 3;
+      status.innerText = count + "...";
+      const cntInt = setInterval(() => {
+        count--;
+        if (count > 0) {
+          status.innerText = count + "...";
+        } else {
+          clearInterval(cntInt);
+          status.innerText = "üfleniyor...";
+          setTimeout(() => {
+            document.querySelectorAll('.flame').forEach(f => f.classList.add('off'));
+            status.innerText = "iyiki doğdun";
+            document.getElementById('envelope-box').style.display = 'block';
+          }, 800);
+        }
+      }, 800);
+    }
+
+    function openLetter() {
+      document.getElementById('letter-modal').style.display = 'block';
+    }
+    function closeLetter() {
+      document.getElementById('letter-modal').style.display = 'none';
+      document.getElementById('next-box-wrapper').style.display = 'block';
+    }
+
+    // Doğrudan tanımlanan resim listesi
+    const fotograflar = [
+      "foto1.jpg",
+      "foto2.jpg",
+      "foto3.jpg",
+      "foto4.jpg",
+      "foto5.jpg",
+      "foto6.jpg",
+      "foto7.jpg",
+      "foto8.png"
+    ];
+
+    let curImg = 0;
+
+    function updateImage() {
+      const img = document.getElementById('gallery-img');
+      img.src = fotograflar[curImg];
+    }
+
+    function openGallery() {
+      document.getElementById('next-box-wrapper').style.display = 'none';
+      document.getElementById('gallery-modal').style.display = 'block';
+      updateImage();
+    }
+    function prevImg() {
+      curImg = (curImg - 1 + fotograflar.length) % fotograflar.length;
+      updateImage();
+    }
+    function nextImg() {
+      curImg = (curImg + 1) % fotograflar.length;
+      updateImage();
+    }
+
+    function finishGallery() {
+      document.getElementById('gallery-modal').style.display = 'none';
+      document.getElementById('main-content').style.display = 'none';
+      const finalScreen = document.getElementById('final-screen');
+      finalScreen.style.display = 'flex';
+
+      for (let i = 0; i < 15; i++) {
+        setTimeout(() => {
+          const t = document.createElement('div');
+          t.className = 'flying-heart-text';
+          t.innerText = 'ipek ❤️ hüseyin';
+          t.style.left = Math.random() * 70 + 15 + 'vw';
+          finalScreen.appendChild(t);
+        }, i * 300);
+      }
+
+      setTimeout(() => {
+        document.getElementById('final-msg').style.display = 'none';
+        document.getElementById('final-title').style.display = 'block';
+        startFireworks();
+      }, 4500);
+    }
+
+    function startFireworks() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let particles = [];
+      function createHeart() {
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2 - 30;
+        for (let a = 0; a < Math.PI * 2; a += 0.1) {
+          const vx = 16 * Math.pow(Math.sin(a), 3);
+          const vy = -(13 * Math.cos(a) - 5 * Math.cos(2*a) - 2 * Math.cos(3*a) - Math.cos(4*a));
+          particles.push({
+            x: cx, y: cy,
+            vx: vx * 0.35, vy: vy * 0.35,
+            alpha: 1, color: `hsl(${Math.random() * 50 + 320}, 100%, 65%)`
+          });
+        }
+      }
+
+      setInterval(createHeart, 1000);
+
+      function render() {
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, idx) => {
+          p.x += p.vx; p.y += p.vy; p.alpha -= 0.01;
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(p.alpha, 0);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+          ctx.fill();
+          if (p.alpha <= 0) particles.splice(idx, 1);
+        });
+        requestAnimationFrame(render);
+      }
+      render();
+    }
+  </script>
+</body>
+</html>
